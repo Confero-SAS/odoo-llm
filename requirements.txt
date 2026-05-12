@@ -12,7 +12,6 @@ llama_index
 markdown2
 markdownify
 mcp
-mistralai
 nltk
 numpy
 ollama
