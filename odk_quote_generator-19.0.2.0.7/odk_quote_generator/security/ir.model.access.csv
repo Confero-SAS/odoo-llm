@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_odk_pricing_catalog_admin,odk.pricing.catalog admin,model_odk_pricing_catalog,group_odk_pricing_admin,1,1,1,1
+access_odk_pricing_catalog_manager,odk.pricing.catalog manager,model_odk_pricing_catalog,group_odk_sales_manager,1,0,0,0
+access_odk_pricing_catalog_commercial,odk.pricing.catalog commercial,model_odk_pricing_catalog,group_odk_commercial,1,0,0,0
+access_odk_pricing_catalog_direction,odk.pricing.catalog direction,model_odk_pricing_catalog,group_odk_direction,1,0,0,0
+access_odk_pricing_grid_admin,odk.pricing.grid admin,model_odk_pricing_grid,group_odk_pricing_admin,1,1,1,1
+access_odk_pricing_grid_manager,odk.pricing.grid manager,model_odk_pricing_grid,group_odk_sales_manager,1,0,0,0
+access_odk_pricing_grid_commercial,odk.pricing.grid commercial,model_odk_pricing_grid,group_odk_commercial,1,0,0,0
+access_odk_pricing_grid_direction,odk.pricing.grid direction,model_odk_pricing_grid,group_odk_direction,1,0,0,0
+access_odk_pricing_tier_admin,odk.pricing.tier admin,model_odk_pricing_tier,group_odk_pricing_admin,1,1,1,1
+access_odk_pricing_tier_manager,odk.pricing.tier manager,model_odk_pricing_tier,group_odk_sales_manager,1,0,0,0
+access_odk_pricing_tier_commercial,odk.pricing.tier commercial,model_odk_pricing_tier,group_odk_commercial,1,0,0,0
+access_odk_pricing_tier_direction,odk.pricing.tier direction,model_odk_pricing_tier,group_odk_direction,1,0,0,0
+access_odk_quote_generator_wizard_commercial,odk.quote.generator.wizard commercial,model_odk_quote_generator_wizard,group_odk_commercial,1,1,1,1
+access_odk_quote_generator_wizard_manager,odk.quote.generator.wizard manager,model_odk_quote_generator_wizard,group_odk_sales_manager,1,1,1,1
+access_odk_quote_generator_wizard_admin,odk.quote.generator.wizard admin,model_odk_quote_generator_wizard,group_odk_pricing_admin,1,1,1,1

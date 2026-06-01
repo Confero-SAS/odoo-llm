@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================== -->
+    <!-- Layout principal du devis ODK                                       -->
+    <!-- Le CSS est integre EN DUR dans le template (balises <style>) afin   -->
+    <!-- de ne pas dependre du bundle d'assets : sous wkhtmltopdf le corps   -->
+    <!-- du rapport ne recoit pas toujours web.report_assets_common, d'ou un -->
+    <!-- rendu non stylise. L'integration inline garantit la charte ODK.     -->
+    <!-- ================================================================== -->
+    <template id="report_odk_quote_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="odk_quote_generator.odk_external_layout">
+                    <t t-set="doc" t-value="o"/>
+                    <main class="page">
+                        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+                        <style>
+                            .odk-page { font-family: "Arial", "Helvetica", sans-serif; color: #333333; font-size: 11px; }
+                            .odk-header-block { display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 3px solid #ED7D31; padding-bottom: 10px; margin-bottom: 14px; }
+                            .odk-title-wrap { flex: 1; }
+                            .odk-title { color: #1F3864; font-size: 26px; font-weight: 700; margin: 0; letter-spacing: 0.5px; }
+                            .odk-doc-number { display: inline-block; background-color: #1F3864; color: #ffffff; font-size: 12px; font-weight: 700; padding: 3px 12px; border-radius: 12px; margin-top: 6px; }
+                            .odk-highlight-badge { background-color: #1F3864; border: none; border-radius: 4px; padding: 9px 16px; text-align: center; min-width: 160px; }
+                            .odk-highlight-badge .odk-badge-label { color: #ED7D31; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+                            .odk-highlight-badge .odk-badge-value { color: #ffffff; font-size: 19px; font-weight: 700; }
+                            .odk-highlight-badge .odk-badge-sub { color: #C7D0E0; font-size: 8px; }
+                            .odk-label { color: #1F3864; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+                            .odk-client-name { font-weight: 700; font-size: 13px; color: #1F3864; }
+                            .odk-block { padding: 8px 12px; }
+                            .odk-meta-table { width: auto; border-collapse: collapse; }
+                            .odk-meta-table td { padding: 2px 6px; font-size: 11px; vertical-align: top; }
+                            .odk-meta-table td:first-child { color: #666666; white-space: nowrap; padding-right: 14px; }
+                            .odk-meta-table td:nth-child(2) { font-weight: 600; }
+                            .odk-section-title { color: #1F3864; font-weight: 700; font-size: 13px; text-transform: uppercase; border-bottom: 2px solid #ED7D31; padding-bottom: 3px; margin-bottom: 8px; letter-spacing: 0.5px; }
+                            .odk-conditions { background-color: #F5F8FC; border-left: 4px solid #ED7D31; padding: 10px 14px; margin: 12px 0; }
+                            .odk-conditions-sub { color: #1F3864; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin: 8px 0 4px 0; }
+                            .odk-conditions-table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+                            .odk-conditions-table td { font-size: 10px; padding: 4px 8px; border: 1px solid #E0E6F0; vertical-align: top; }
+                            .odk-conditions-table td.odk-cond-label { background-color: #E8EDF5; color: #1F3864; font-weight: 700; width: 22%; }
+                            .odk-badge-validated { display: inline-block; background-color: #ED7D31; color: #ffffff; font-size: 10px; font-weight: 700; padding: 4px 10px; margin-top: 8px; border-radius: 2px; }
+                            .odk-lines-table { width: 100%; border-collapse: collapse; }
+                            .odk-lines-table thead th { background-color: #1F3864; color: #ffffff !important; font-size: 10px; text-transform: uppercase; padding: 8px; letter-spacing: 0.5px; border: none !important; }
+                            .odk-lines-table tbody td { padding: 8px; border-bottom: 1px solid #E0E6F0; font-size: 11px; }
+                            .odk-lines-table tbody tr:nth-child(even) { background-color: #EEF3FA; }
+                            .odk-totals-block { background-color: #F5F8FC; padding: 8px 12px; border-top: 3px solid #ED7D31; }
+                            .odk-totals-table { width: 100%; margin-bottom: 0; }
+                            .odk-totals-table td { padding: 4px 6px; font-size: 11px; }
+                            .odk-grand-total td { color: #1F3864; font-weight: 700; font-size: 13px; border-top: 2px solid #1F3864; padding-top: 8px; }
+                            .odk-note { background-color: #FFFAF5; border-left: 3px solid #ED7D31; padding: 8px 12px; }
+                            .odk-legal { font-size: 9px; color: #888888; text-align: center; border-top: 1px solid #E0E6F0; padding-top: 6px; }
+                        </style>
+                        <div class="odk-page">
+
+                            <!-- En-tete : titre + numero + badge mise en avant -->
+                            <div class="odk-header-block">
+                                <div class="odk-title-wrap">
+                                    <h1 class="odk-title">DEVIS COMMERCIAL</h1>
+                                    <div class="odk-doc-number">
+                                        <span t-field="o.name"/>
+                                    </div>
+                                </div>
+                                <div class="odk-highlight-badge">
+                                    <div class="odk-badge-label">Total mensuel HT</div>
+                                    <div class="odk-badge-value">
+                                        <span t-out="'{:,.2f}'.format(o.amount_untaxed or 0).replace(',', ' ').replace('.', ',') + ' EUR'"/>
+                                    </div>
+                                    <div class="odk-badge-sub">facturation mensuelle</div>
+                                </div>
+                            </div>
+
+                            <!-- Bloc meta (references) a GAUCHE / client a DROITE -->
+                            <div class="row mt-3 mb-3">
+                                <div class="col-6 odk-block" style="text-align: left;">
+                                    <div class="odk-label">NOS REFERENCES</div>
+                                    <table class="odk-meta-table">
+                                        <tr>
+                                            <td>Date du devis</td>
+                                            <td><span t-field="o.date_order" t-options='{"widget": "date"}'/></td>
+                                        </tr>
+                                        <tr t-if="o.validity_date">
+                                            <td>Valide jusqu'au</td>
+                                            <td><span t-field="o.validity_date"/></td>
+                                        </tr>
+                                        <tr t-if="o.user_id">
+                                            <td>Commercial</td>
+                                            <td><span t-field="o.user_id.name"/></td>
+                                        </tr>
+                                        <tr t-if="o.client_order_ref">
+                                            <td>Reference client</td>
+                                            <td><span t-field="o.client_order_ref"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-6 odk-block" style="text-align: right;">
+                                    <div class="odk-label">CLIENT</div>
+                                    <div class="odk-client-name" t-field="o.partner_id.name"/>
+                                    <div t-field="o.partner_id"
+                                         t-options='{"widget": "contact", "fields": ["address", "phone", "email"], "no_marker": true}'/>
+                                </div>
+                            </div>
+
+                            <!-- Bloc Conditions tarifaires ODK -->
+                            <div t-if="o.odk_is_quote" class="odk-conditions">
+                                <div class="odk-section-title">CONDITIONS TARIFAIRES ODK</div>
+
+                                <!-- Section Packs Factures -->
+                                <t t-if="o.odk_catalog_id">
+                                    <div class="odk-conditions-sub">Packs Factures</div>
+                                    <table class="odk-conditions-table">
+                                        <tr>
+                                            <td class="odk-cond-label">Catalogue</td>
+                                            <td><span t-field="o.odk_catalog_id.name"/></td>
+                                            <td class="odk-cond-label">Engagement</td>
+                                            <td><span t-field="o.odk_engagement_months"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="odk-cond-label">Grille / Offre</td>
+                                            <td><span t-field="o.odk_grid_id.name"/></td>
+                                            <td class="odk-cond-label">Palier</td>
+                                            <td>
+                                                <span t-field="o.odk_tier_id.code"/>
+                                                <t t-if="o.odk_tier_id.libelle">
+                                                    - <span t-field="o.odk_tier_id.libelle"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr t-if="o.odk_input_volume_annuel">
+                                            <td class="odk-cond-label">Volume annuel</td>
+                                            <td colspan="3">
+                                                <span t-out="'{:,}'.format(o.odk_input_volume_annuel or 0).replace(',', ' ')"/> factures
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </t>
+
+                                <!-- Section Abonnement ODK -->
+                                <t t-if="o.odk_ab_catalog_id">
+                                    <div class="odk-conditions-sub">Abonnement ODK</div>
+                                    <table class="odk-conditions-table">
+                                        <tr>
+                                            <td class="odk-cond-label">Catalogue</td>
+                                            <td><span t-field="o.odk_ab_catalog_id.name"/></td>
+                                            <td class="odk-cond-label">Engagement</td>
+                                            <td><span t-field="o.odk_ab_engagement_months"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="odk-cond-label">Grille / Offre</td>
+                                            <td><span t-field="o.odk_ab_grid_id.name"/></td>
+                                            <td class="odk-cond-label">Palier</td>
+                                            <td>
+                                                <span t-field="o.odk_ab_tier_id.code"/>
+                                                <t t-if="o.odk_ab_tier_id.libelle">
+                                                    - <span t-field="o.odk_ab_tier_id.libelle"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="odk-cond-label">Nb magasins</td>
+                                            <td><span t-field="o.odk_input_shops"/></td>
+                                            <td class="odk-cond-label">PA fournie par tiers</td>
+                                            <td>
+                                                <t t-if="o.odk_input_pa_tierce">Oui</t>
+                                                <t t-else="">Non</t>
+                                            </td>
+                                        </tr>
+                                        <tr t-if="o.odk_input_nb_caisses or o.odk_input_tx_total">
+                                            <td class="odk-cond-label">Total caisses</td>
+                                            <td><span t-out="'{:,}'.format(o.odk_input_nb_caisses or 0).replace(',', ' ')"/></td>
+                                            <td class="odk-cond-label">Transactions / mois</td>
+                                            <td><span t-out="'{:,}'.format(o.odk_input_tx_total or 0).replace(',', ' ')"/></td>
+                                        </tr>
+                                    </table>
+                                </t>
+
+                                <div t-if="o.odk_is_off_grid and o.odk_is_validated"
+                                     class="odk-badge-validated">
+                                    Hors-grille valide par
+                                    <span t-field="o.odk_validation_user_id.name"/>
+                                    le
+                                    <span t-field="o.odk_validation_date"
+                                          t-options='{"widget": "date"}'/>
+                                </div>
+                            </div>
+
+                            <!-- Tableau des lignes -->
+                            <div class="odk-section-title mt-3">DETAIL DU DEVIS</div>
+                            <table class="table odk-lines-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Designation</th>
+                                        <th class="text-end">Quantite</th>
+                                        <th class="text-end">Prix unitaire HT</th>
+                                        <th class="text-end">Total HT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="o.order_line" t-as="line">
+                                        <tr>
+                                            <td>
+                                                <span t-field="line.name"/>
+                                            </td>
+                                            <td class="text-end">
+                                                <span t-out="'{:,.2f}'.format(line.product_uom_qty or 0).replace(',', ' ').replace('.', ',')"/>
+                                            </td>
+                                            <td class="text-end">
+                                                <span t-out="'{:,.2f}'.format(line.price_unit or 0).replace(',', ' ').replace('.', ',') + ' EUR'"/>
+                                            </td>
+                                            <td class="text-end">
+                                                <span t-out="'{:,.2f}'.format(line.price_subtotal or 0).replace(',', ' ').replace('.', ',') + ' EUR'"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+
+                            <!-- Bloc totaux -->
+                            <div class="row justify-content-end">
+                                <div class="col-5 odk-totals-block">
+                                    <table class="table odk-totals-table">
+                                        <tr>
+                                            <td>Total HT</td>
+                                            <td class="text-end">
+                                                <span t-out="'{:,.2f}'.format(o.amount_untaxed or 0).replace(',', ' ').replace('.', ',') + ' EUR'"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>TVA</td>
+                                            <td class="text-end">
+                                                <span t-out="'{:,.2f}'.format(o.amount_tax or 0).replace(',', ' ').replace('.', ',') + ' EUR'"/>
+                                            </td>
+                                        </tr>
+                                        <tr class="odk-grand-total">
+                                            <td>TOTAL TTC</td>
+                                            <td class="text-end">
+                                                <span t-out="'{:,.2f}'.format(o.amount_total or 0).replace(',', ' ').replace('.', ',') + ' EUR'"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Note libre / conditions generales -->
+                            <div t-if="o.note" class="odk-note mt-3">
+                                <div class="odk-label">CONDITIONS PARTICULIERES</div>
+                                <div t-field="o.note"/>
+                            </div>
+
+                            <div class="odk-legal mt-4">
+                                <p>
+                                    Devis etabli pour acceptation. Validite : 30 jours sauf
+                                    mention contraire. Tarifs Hors Taxes en euros.
+                                </p>
+                            </div>
+                        </div>
+                    </main>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ================================================================== -->
+    <!-- Layout externe : header BLANC + liseré ORANGE + footer GRIS         -->
+    <!-- Les styles header/footer sont inlines : wkhtmltopdf rend l'en-tete  -->
+    <!-- et le pied de page comme des documents separes.                     -->
+    <!-- ================================================================== -->
+    <template id="odk_external_layout">
+        <div class="header">
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+            <style>
+                .odk-header-bar { background-color: #ffffff; padding: 6px 24px 0 24px; border-bottom: 4px solid #ED7D31; font-family: "Arial", "Helvetica", sans-serif; }
+                .odk-header-inner { display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; }
+                .odk-header-left { text-align: left; }
+                .odk-company-name { font-weight: 700; font-size: 15px; color: #1F3864; }
+                .odk-company-tagline { font-size: 9px; color: #888888; }
+                .odk-logo { max-height: 46px; max-width: 210px; }
+            </style>
+            <div class="odk-header-bar">
+                <div class="odk-header-inner">
+                    <div class="odk-header-left">
+                        <div class="odk-company-tagline">
+                            Operateur de dematerialisation de donnees de caisse et e-reporting de transaction.
+                        </div>
+                    </div>
+                    <img t-if="doc.company_id.logo"
+                         t-att-src="image_data_uri(doc.company_id.logo)"
+                         class="odk-logo" alt="Logo"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+            <style>
+                .odk-footer-bar { background-color: #F0F1F3; color: #555555; padding: 6px 24px; border-top: 2px solid #ED7D31; font-size: 8px; font-family: "Arial", "Helvetica", sans-serif; }
+                .odk-footer-inner { display: flex; justify-content: space-between; align-items: center; }
+                .odk-footer-right { text-align: right; }
+            </style>
+            <div class="odk-footer-bar">
+                <div class="odk-footer-inner">
+                    <div class="odk-footer-left">
+                        <span t-field="doc.company_id.name"/>
+                        <t t-if="doc.company_id.vat">
+                            - TVA <span t-field="doc.company_id.vat"/>
+                        </t>
+                        <t t-if="doc.company_id.email">
+                            | <span t-field="doc.company_id.email"/>
+                        </t>
+                    </div>
+                    <div class="odk-footer-right">
+                        Document commercial - confidentiel | page
+                        <span class="page"/> / <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <t t-out="0"/>
+    </template>
+
+</odoo>

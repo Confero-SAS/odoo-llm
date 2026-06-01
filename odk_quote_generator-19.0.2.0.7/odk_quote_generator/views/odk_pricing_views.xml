@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================== -->
+    <!-- CATALOGUE                                                          -->
+    <!-- ================================================================== -->
+    <record id="view_odk_pricing_catalog_list" model="ir.ui.view">
+        <field name="name">odk.pricing.catalog.list</field>
+        <field name="model">odk.pricing.catalog</field>
+        <field name="arch" type="xml">
+            <list string="Catalogues tarifaires ODK">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="catalog_type"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_odk_pricing_catalog_form" model="ir.ui.view">
+        <field name="name">odk.pricing.catalog.form</field>
+        <field name="model">odk.pricing.catalog</field>
+        <field name="arch" type="xml">
+            <form string="Catalogue tarifaire ODK">
+                <sheet>
+                    <widget name="web_ribbon" title="Archive" bg_color="bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Ex: Packs Factures V4"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="catalog_type"/>
+                            <field name="sequence"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Description du catalogue..."/>
+                    <notebook>
+                        <page string="Grilles tarifaires" name="grids">
+                            <field name="grid_ids">
+                                <list>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="currency_id"/>
+                                    <field name="active" widget="boolean_toggle"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_odk_pricing_catalog" model="ir.actions.act_window">
+        <field name="name">Catalogues tarifaires</field>
+        <field name="res_model">odk.pricing.catalog</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Creer un nouveau catalogue</p>
+            <p>Les catalogues regroupent les grilles tarifaires (Packs Factures, Abonnement, etc.).</p>
+        </field>
+    </record>
+
+    <!-- ================================================================== -->
+    <!-- GRILLE                                                             -->
+    <!-- ================================================================== -->
+    <record id="view_odk_pricing_grid_list" model="ir.ui.view">
+        <field name="name">odk.pricing.grid.list</field>
+        <field name="model">odk.pricing.grid</field>
+        <field name="arch" type="xml">
+            <list string="Grilles tarifaires">
+                <field name="sequence" widget="handle"/>
+                <field name="catalog_id"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="catalog_type"/>
+                <field name="currency_id"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_odk_pricing_grid_form" model="ir.ui.view">
+        <field name="name">odk.pricing.grid.form</field>
+        <field name="model">odk.pricing.grid</field>
+        <field name="arch" type="xml">
+            <form string="Grille tarifaire">
+                <sheet>
+                    <widget name="web_ribbon" title="Archive" bg_color="bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Ex: Offre 1 - Spot 0,22 EUR"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="catalog_id"/>
+                            <field name="catalog_type" invisible="1"/>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="valid_from"/>
+                            <field name="valid_to"/>
+                        </group>
+                    </group>
+                    <group string="Volume (Packs Factures)"
+                           invisible="catalog_type != 'volume'">
+                        <field name="spot_price"/>
+                        <field name="floor_price"/>
+                    </group>
+                    <group string="Reseau (Abonnement)"
+                           invisible="catalog_type != 'network'">
+                        <field name="overage_caisse_price"/>
+                        <field name="overage_tx_price"/>
+                    </group>
+                    <notebook>
+                        <page string="Paliers" name="tiers">
+                            <field name="tier_ids">
+                                <list>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="code"/>
+                                    <field name="libelle"/>
+                                    <field name="volume_annuel"
+                                           column_invisible="parent.catalog_type != 'volume'"/>
+                                    <field name="shop_min"
+                                           column_invisible="parent.catalog_type != 'network'"/>
+                                    <field name="shop_max"
+                                           column_invisible="parent.catalog_type != 'network'"/>
+                                    <field name="caisses_included"
+                                           column_invisible="parent.catalog_type != 'network'"/>
+                                    <field name="tx_caisse_mois"
+                                           column_invisible="parent.catalog_type != 'network'"/>
+                                    <field name="unit_price_12m"/>
+                                    <field name="unit_price_24m"/>
+                                    <field name="unit_price_36m"/>
+                                    <field name="surcharge_pa_tiers_tx"
+                                           column_invisible="parent.catalog_type != 'network'"/>
+                                    <field name="active" widget="boolean_toggle"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_odk_pricing_grid" model="ir.actions.act_window">
+        <field name="name">Grilles tarifaires</field>
+        <field name="res_model">odk.pricing.grid</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ================================================================== -->
+    <!-- PALIER                                                             -->
+    <!-- ================================================================== -->
+    <record id="view_odk_pricing_tier_list" model="ir.ui.view">
+        <field name="name">odk.pricing.tier.list</field>
+        <field name="model">odk.pricing.tier</field>
+        <field name="arch" type="xml">
+            <list string="Paliers tarifaires">
+                <field name="sequence" widget="handle"/>
+                <field name="grid_id"/>
+                <field name="code"/>
+                <field name="libelle"/>
+                <field name="unit_price_12m"/>
+                <field name="unit_price_24m"/>
+                <field name="unit_price_36m"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_odk_pricing_tier_form" model="ir.ui.view">
+        <field name="name">odk.pricing.tier.form</field>
+        <field name="model">odk.pricing.tier</field>
+        <field name="arch" type="xml">
+            <form string="Palier tarifaire">
+                <sheet>
+                    <widget name="web_ribbon" title="Archive" bg_color="bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="libelle"/>
+                        <h1><field name="libelle" placeholder="Ex: Pack M"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="grid_id"/>
+                            <field name="catalog_type" invisible="1"/>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Variable de selection (Volume)"
+                           invisible="catalog_type != 'volume'">
+                        <field name="volume_annuel"/>
+                    </group>
+                    <group string="Variables de selection (Reseau)"
+                           invisible="catalog_type != 'network'">
+                        <group>
+                            <field name="shop_min"/>
+                            <field name="shop_max" help="0 = sans limite haute"/>
+                        </group>
+                        <group>
+                            <field name="caisses_included"/>
+                            <field name="tx_caisse_mois"/>
+                            <field name="surcharge_pa_tiers_tx"/>
+                        </group>
+                    </group>
+                    <group string="Prix unitaires HT par duree d'engagement">
+                        <field name="unit_price_12m"/>
+                        <field name="unit_price_24m"/>
+                        <field name="unit_price_36m"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_odk_pricing_tier" model="ir.actions.act_window">
+        <field name="name">Paliers tarifaires</field>
+        <field name="res_model">odk.pricing.tier</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

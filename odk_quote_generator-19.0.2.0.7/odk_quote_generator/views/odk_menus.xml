@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================== -->
+    <!-- Racine de l'application ODK Devis                                   -->
+    <!-- ================================================================== -->
+    <menuitem id="menu_odk_root"
+              name="ODK Devis"
+              web_icon="odk_quote_generator,static/description/icon.png"
+              sequence="50"
+              groups="odk_quote_generator.group_odk_direction"/>
+
+    <!-- ================================================================== -->
+    <!-- Section : Devis                                                     -->
+    <!-- ================================================================== -->
+    <menuitem id="menu_odk_quotes"
+              name="Devis"
+              parent="menu_odk_root"
+              sequence="10"/>
+
+    <menuitem id="menu_odk_quotes_all"
+              name="Tous les devis ODK"
+              parent="menu_odk_quotes"
+              action="action_odk_quotes"
+              sequence="10"/>
+
+    <!-- ================================================================== -->
+    <!-- Section : Configuration (catalogues / grilles / paliers)            -->
+    <!-- Visible par les 4 roles (via implied_ids -> group_odk_direction).   -->
+    <!-- Lecture pour tous ; creation/modification reservee a l'Admin        -->
+    <!-- Tarifaire ODK (group_odk_pricing_admin) via ir.model.access.csv.    -->
+    <!-- ================================================================== -->
+    <menuitem id="menu_odk_pricing"
+              name="Configuration"
+              parent="menu_odk_root"
+              sequence="20"
+              groups="odk_quote_generator.group_odk_direction"/>
+
+    <menuitem id="menu_odk_pricing_catalogs"
+              name="Catalogues tarifaires"
+              parent="menu_odk_pricing"
+              action="action_odk_pricing_catalog"
+              sequence="10"/>
+
+    <menuitem id="menu_odk_pricing_grids"
+              name="Grilles tarifaires"
+              parent="menu_odk_pricing"
+              action="action_odk_pricing_grid"
+              sequence="20"/>
+
+    <menuitem id="menu_odk_pricing_tiers"
+              name="Paliers"
+              parent="menu_odk_pricing"
+              action="action_odk_pricing_tier"
+              sequence="30"/>
+
+</odoo>

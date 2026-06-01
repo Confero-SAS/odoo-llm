@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- noupdate="1" : les catalogues d'origine ne sont pas reecrases lors
+         d'une mise a jour du module, ce qui permet a l'Admin Tarifaire
+         d'ajuster les libelles, descriptions, sequences en production. -->
+    <data noupdate="1">
+
+        <record id="catalog_packs_factures" model="odk.pricing.catalog">
+            <field name="name">Packs Factures</field>
+            <field name="code">PACKS_FACTURES</field>
+            <field name="catalog_type">volume</field>
+            <field name="sequence">10</field>
+            <field name="description">Catalogue de packs de dematerialisation et envoi
+de factures. Engagement 12 / 24 / 36 mois, mensualite calculee a partir d'un
+volume annuel cible (vol x PU / 12). Depassement facture au prix spot.
+Plancher tarifaire ODK : 0,18 EUR HT par facture.</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="catalog_abonnement_odk" model="odk.pricing.catalog">
+            <field name="name">Abonnement ODK</field>
+            <field name="code">ABONNEMENT_ODK</field>
+            <field name="catalog_type">network</field>
+            <field name="sequence">20</field>
+            <field name="description">Catalogue d'abonnement reseau (caisse + transactions)
+ODK. Tarif mensuel par magasin selon palier (XS a XXL). 8 fonctionnalites incluses :
+dematerialisation tickets, e-reporting, archivage legal, ecriture comptable, PAF,
+ticket digital, programme fidelite, cas d'usage reforme. Deux offres : avec PA fournie
+par ODK ou avec PA tierce (surcharge par transaction).</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

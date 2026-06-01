@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- ============================================================ -->
+        <!-- Categorie de module dediee ODK Quote Generator                -->
+        <!-- Sert a regrouper les groupes dans l'onglet "Droits d'acces"   -->
+        <!-- du formulaire utilisateur (selection exclusive radio).        -->
+        <!-- ============================================================ -->
+        <record id="module_category_odk_quote" model="ir.module.category">
+            <field name="name">ODK - Generateur de Devis</field>
+            <field name="description">Acces au generateur de devis ODK (Packs Factures + Abonnement).</field>
+            <field name="sequence">25</field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- Privilege ODK (Odoo 19)                                       -->
+        <!-- Depuis Odoo 19, les groupes ne portent plus 'category_id'     -->
+        <!-- mais 'privilege_id' (modele res.groups.privilege). C'est le   -->
+        <!-- privilege qui se rattache a la categorie de module et qui     -->
+        <!-- regroupe les groupes en selection radio dans le formulaire    -->
+        <!-- utilisateur.                                                  -->
+        <!-- ============================================================ -->
+        <record id="privilege_odk_quote" model="res.groups.privilege">
+            <field name="name">ODK - Generateur de Devis</field>
+            <field name="category_id" ref="module_category_odk_quote"/>
+            <field name="sequence">25</field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- Groupes ODK                                                   -->
+        <!--                                                                -->
+        <!-- Hierarchie d'heritage (implied_ids) :                          -->
+        <!--   Direction  <- Commercial <- Manager <- Admin Tarifaire       -->
+        <!--                                                                -->
+        <!-- "Direction" est la base : visibilite du module en lecture      -->
+        <!-- seule (menus + grilles + devis ODK de la societe). Les roles   -->
+        <!-- au-dessus ajoutent les droits d'ecriture correspondants via    -->
+        <!-- les ACL (ir.model.access.csv) et les ir.rule ci-dessous.       -->
+        <!-- ============================================================ -->
+        <record id="group_odk_direction" model="res.groups">
+            <field name="name">Direction (lecture seule)</field>
+            <field name="privilege_id" ref="privilege_odk_quote"/>
+            <field name="implied_ids" eval="[(4, ref('sales_team.group_sale_salesman_all_leads'))]"/>
+            <field name="comment">Acces transverse en consultation a tous les devis ODK et grilles tarifaires de la societe. Aucune ecriture.</field>
+        </record>
+
+        <record id="group_odk_commercial" model="res.groups">
+            <field name="name">Commercial</field>
+            <field name="privilege_id" ref="privilege_odk_quote"/>
+            <field name="implied_ids" eval="[(4, ref('group_odk_direction')),
+                                              (4, ref('sales_team.group_sale_salesman')),
+                                              (4, ref('crm.group_use_lead'))]"/>
+            <field name="comment">Cree des devis a partir des grilles ODK et les rattache a un contact + opportunite. Ne voit que ses propres devis ODK. Ne peut pas surcharger les prix hors-grille.</field>
+        </record>
+
+        <record id="group_odk_sales_manager" model="res.groups">
+            <field name="name">Manager Commercial (validation hors-grille)</field>
+            <field name="privilege_id" ref="privilege_odk_quote"/>
+            <field name="implied_ids" eval="[(4, ref('group_odk_commercial')),
+                                              (4, ref('sales_team.group_sale_manager'))]"/>
+            <field name="comment">Toutes les actions du Commercial + valide les devis dont les prix derogent aux grilles (override). Voit tous les devis ODK de la societe.</field>
+        </record>
+
+        <record id="group_odk_pricing_admin" model="res.groups">
+            <field name="name">Admin Tarifaire (grilles et catalogues)</field>
+            <field name="privilege_id" ref="privilege_odk_quote"/>
+            <field name="implied_ids" eval="[(4, ref('group_odk_sales_manager'))]"/>
+            <field name="comment">Toutes les actions du Manager + cree/modifie les catalogues, grilles tarifaires et paliers. Profil "super-utilisateur metier" du module.</field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- Regles d'enregistrement multi-societes                         -->
+        <!--                                                                -->
+        <!-- Les catalogues, grilles et paliers tarifaires sont PARTAGES    -->
+        <!-- par defaut (company_id = False) afin que toutes les filiales   -->
+        <!-- du groupe Confero utilisent la meme grille de reference.       -->
+        <!-- Un admin peut neanmoins reserver une grille a une societe en   -->
+        <!-- la rattachant explicitement (company_id renseigne).            -->
+        <!-- ============================================================ -->
+        <record id="rule_odk_pricing_catalog_company" model="ir.rule">
+            <field name="name">ODK Catalogue : partage multi-societes</field>
+            <field name="model_id" ref="model_odk_pricing_catalog"/>
+            <field name="domain_force">
+                ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+            </field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_odk_pricing_grid_company" model="ir.rule">
+            <field name="name">ODK Grille : partage multi-societes</field>
+            <field name="model_id" ref="model_odk_pricing_grid"/>
+            <field name="domain_force">
+                ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+            </field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_odk_pricing_tier_company" model="ir.rule">
+            <field name="name">ODK Palier : herite de la grille</field>
+            <field name="model_id" ref="model_odk_pricing_tier"/>
+            <field name="domain_force">
+                ['|', ('grid_id.company_id', '=', False), ('grid_id.company_id', 'in', company_ids)]
+            </field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- Regles d'enregistrement sur les devis ODK                      -->
+        <!--                                                                -->
+        <!-- 1. Commercial ne voit que ses propres devis ODK.               -->
+        <!-- 2. Manager / Admin voient tous les devis ODK de leur societe.  -->
+        <!-- 3. Direction voit en lecture seule tous les devis ODK de la    -->
+        <!--    societe (acces lecture via implied de salesman_all_leads,   -->
+        <!--    ecriture bloquee via la matrice d'ACL standard sale).       -->
+        <!--                                                                -->
+        <!-- Les devis non-ODK (odk_is_quote = False) ne sont pas affectes  -->
+        <!-- par ces regles : ils restent regis par les regles standard du  -->
+        <!-- module sale (sales_team).                                      -->
+        <!-- ============================================================ -->
+        <record id="rule_odk_quote_commercial_own" model="ir.rule">
+            <field name="name">Devis ODK : Commercial voit ses propres devis</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="groups" eval="[(4, ref('group_odk_commercial'))]"/>
+            <field name="domain_force">
+                ['|',
+                    ('odk_is_quote', '=', False),
+                    '&amp;',
+                        ('user_id', '=', user.id),
+                        ('company_id', 'in', company_ids)]
+            </field>
+        </record>
+
+        <record id="rule_odk_quote_manager_all" model="ir.rule">
+            <field name="name">Devis ODK : Manager voit tous les devis de sa societe</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="groups" eval="[(4, ref('group_odk_sales_manager'))]"/>
+            <field name="domain_force">
+                [('company_id', 'in', company_ids)]
+            </field>
+        </record>
+
+    </data>
+</odoo>

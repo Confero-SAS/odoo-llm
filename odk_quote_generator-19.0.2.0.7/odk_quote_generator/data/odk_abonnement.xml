@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ============================================================== -->
+        <!-- Abonnement ODK V1 - Grille "PA fournie par ODK"                 -->
+        <!--                                                                  -->
+        <!-- Loyer HT mensuel par magasin, par palier reseau.                -->
+        <!-- Caisses et transactions incluses selon palier.                  -->
+        <!-- Pas de surcharge par transaction (PA ODK).                      -->
+        <!-- Depassement caisse : +4 EUR/mois  Depassement tx : +0,008 EUR  -->
+        <!-- ============================================================== -->
+        <record id="grid_abo_pa_odk" model="odk.pricing.grid">
+            <field name="name">Avec PA ODK</field>
+            <field name="code">PA_ODK</field>
+            <field name="sequence">10</field>
+            <field name="catalog_id" ref="catalog_abonnement_odk"/>
+            <field name="company_id" eval="False"/>
+            <field name="currency_id" ref="base.EUR"/>
+            <field name="overage_caisse_price">4.00</field>
+            <field name="overage_tx_price">0.008</field>
+        </record>
+
+        <record id="tier_abo_paodk_xs" model="odk.pricing.tier">
+            <field name="code">XS</field>
+            <field name="libelle">Tres petit reseau (1 - 9 magasins)</field>
+            <field name="sequence">10</field>
+            <field name="grid_id" ref="grid_abo_pa_odk"/>
+            <field name="shop_min">1</field>
+            <field name="shop_max">9</field>
+            <field name="caisses_included">2</field>
+            <field name="tx_caisse_mois">5000</field>
+            <field name="unit_price_12m">32.00</field>
+            <field name="unit_price_24m">29.00</field>
+            <field name="unit_price_36m">27.00</field>
+        </record>
+
+        <record id="tier_abo_paodk_s" model="odk.pricing.tier">
+            <field name="code">S</field>
+            <field name="libelle">Petit reseau (10 - 29 magasins)</field>
+            <field name="sequence">20</field>
+            <field name="grid_id" ref="grid_abo_pa_odk"/>
+            <field name="shop_min">10</field>
+            <field name="shop_max">29</field>
+            <field name="caisses_included">2</field>
+            <field name="tx_caisse_mois">5000</field>
+            <field name="unit_price_12m">22.00</field>
+            <field name="unit_price_24m">20.00</field>
+            <field name="unit_price_36m">19.00</field>
+        </record>
+
+        <record id="tier_abo_paodk_m" model="odk.pricing.tier">
+            <field name="code">M</field>
+            <field name="libelle">Reseau moyen (30 - 99 magasins)</field>
+            <field name="sequence">30</field>
+            <field name="grid_id" ref="grid_abo_pa_odk"/>
+            <field name="shop_min">30</field>
+            <field name="shop_max">99</field>
+            <field name="caisses_included">3</field>
+            <field name="tx_caisse_mois">8000</field>
+            <field name="unit_price_12m">28.00</field>
+            <field name="unit_price_24m">26.00</field>
+            <field name="unit_price_36m">24.00</field>
+        </record>
+
+        <record id="tier_abo_paodk_l" model="odk.pricing.tier">
+            <field name="code">L</field>
+            <field name="libelle">Grand reseau (100 - 299 magasins)</field>
+            <field name="sequence">40</field>
+            <field name="grid_id" ref="grid_abo_pa_odk"/>
+            <field name="shop_min">100</field>
+            <field name="shop_max">299</field>
+            <field name="caisses_included">4</field>
+            <field name="tx_caisse_mois">10000</field>
+            <field name="unit_price_12m">27.00</field>
+            <field name="unit_price_24m">26.00</field>
+            <field name="unit_price_36m">25.00</field>
+        </record>
+
+        <record id="tier_abo_paodk_xl" model="odk.pricing.tier">
+            <field name="code">XL</field>
+            <field name="libelle">Tres grand reseau (300 - 699 magasins)</field>
+            <field name="sequence">50</field>
+            <field name="grid_id" ref="grid_abo_pa_odk"/>
+            <field name="shop_min">300</field>
+            <field name="shop_max">699</field>
+            <field name="caisses_included">5</field>
+            <field name="tx_caisse_mois">12000</field>
+            <field name="unit_price_12m">22.00</field>
+            <field name="unit_price_24m">20.00</field>
+            <field name="unit_price_36m">18.00</field>
+        </record>
+
+        <record id="tier_abo_paodk_xxl" model="odk.pricing.tier">
+            <field name="code">XXL</field>
+            <field name="libelle">Pot commun (>= 700 magasins)</field>
+            <field name="sequence">60</field>
+            <field name="grid_id" ref="grid_abo_pa_odk"/>
+            <field name="shop_min">700</field>
+            <field name="shop_max">0</field>
+            <field name="caisses_included">6</field>
+            <field name="tx_caisse_mois">15000</field>
+            <field name="unit_price_12m">18.00</field>
+            <field name="unit_price_24m">16.00</field>
+            <field name="unit_price_36m">14.00</field>
+        </record>
+
+        <!-- ============================================================== -->
+        <!-- Abonnement ODK V1 - Grille "PA tierce"                          -->
+        <!--                                                                  -->
+        <!-- Memes loyers de base, mais surcharge HT par transaction         -->
+        <!-- decroissante avec la taille du reseau :                          -->
+        <!--   XS/S/M : 0,020 EUR/tx     L/XL : 0,015 EUR/tx     XXL : 0,012 -->
+        <!-- ============================================================== -->
+        <record id="grid_abo_pa_tierce" model="odk.pricing.grid">
+            <field name="name">Avec PA tierce</field>
+            <field name="code">PA_TIERCE</field>
+            <field name="sequence">20</field>
+            <field name="catalog_id" ref="catalog_abonnement_odk"/>
+            <field name="company_id" eval="False"/>
+            <field name="currency_id" ref="base.EUR"/>
+            <field name="overage_caisse_price">4.00</field>
+            <field name="overage_tx_price">0.008</field>
+        </record>
+
+        <record id="tier_abo_patierce_xs" model="odk.pricing.tier">
+            <field name="code">XS</field>
+            <field name="libelle">Tres petit reseau (1 - 9 magasins)</field>
+            <field name="sequence">10</field>
+            <field name="grid_id" ref="grid_abo_pa_tierce"/>
+            <field name="shop_min">1</field>
+            <field name="shop_max">9</field>
+            <field name="caisses_included">2</field>
+            <field name="tx_caisse_mois">5000</field>
+            <field name="unit_price_12m">32.00</field>
+            <field name="unit_price_24m">29.00</field>
+            <field name="unit_price_36m">27.00</field>
+            <field name="surcharge_pa_tiers_tx">0.020</field>
+        </record>
+
+        <record id="tier_abo_patierce_s" model="odk.pricing.tier">
+            <field name="code">S</field>
+            <field name="libelle">Petit reseau (10 - 29 magasins)</field>
+            <field name="sequence">20</field>
+            <field name="grid_id" ref="grid_abo_pa_tierce"/>
+            <field name="shop_min">10</field>
+            <field name="shop_max">29</field>
+            <field name="caisses_included">2</field>
+            <field name="tx_caisse_mois">5000</field>
+            <field name="unit_price_12m">22.00</field>
+            <field name="unit_price_24m">20.00</field>
+            <field name="unit_price_36m">19.00</field>
+            <field name="surcharge_pa_tiers_tx">0.020</field>
+        </record>
+
+        <record id="tier_abo_patierce_m" model="odk.pricing.tier">
+            <field name="code">M</field>
+            <field name="libelle">Reseau moyen (30 - 99 magasins)</field>
+            <field name="sequence">30</field>
+            <field name="grid_id" ref="grid_abo_pa_tierce"/>
+            <field name="shop_min">30</field>
+            <field name="shop_max">99</field>
+            <field name="caisses_included">3</field>
+            <field name="tx_caisse_mois">8000</field>
+            <field name="unit_price_12m">28.00</field>
+            <field name="unit_price_24m">26.00</field>
+            <field name="unit_price_36m">24.00</field>
+            <field name="surcharge_pa_tiers_tx">0.020</field>
+        </record>
+
+        <record id="tier_abo_patierce_l" model="odk.pricing.tier">
+            <field name="code">L</field>
+            <field name="libelle">Grand reseau (100 - 299 magasins)</field>
+            <field name="sequence">40</field>
+            <field name="grid_id" ref="grid_abo_pa_tierce"/>
+            <field name="shop_min">100</field>
+            <field name="shop_max">299</field>
+            <field name="caisses_included">4</field>
+            <field name="tx_caisse_mois">10000</field>
+            <field name="unit_price_12m">27.00</field>
+            <field name="unit_price_24m">26.00</field>
+            <field name="unit_price_36m">25.00</field>
+            <field name="surcharge_pa_tiers_tx">0.015</field>
+        </record>
+
+        <record id="tier_abo_patierce_xl" model="odk.pricing.tier">
+            <field name="code">XL</field>
+            <field name="libelle">Tres grand reseau (300 - 699 magasins)</field>
+            <field name="sequence">50</field>
+            <field name="grid_id" ref="grid_abo_pa_tierce"/>
+            <field name="shop_min">300</field>
+            <field name="shop_max">699</field>
+            <field name="caisses_included">5</field>
+            <field name="tx_caisse_mois">12000</field>
+            <field name="unit_price_12m">22.00</field>
+            <field name="unit_price_24m">20.00</field>
+            <field name="unit_price_36m">18.00</field>
+            <field name="surcharge_pa_tiers_tx">0.015</field>
+        </record>
+
+        <record id="tier_abo_patierce_xxl" model="odk.pricing.tier">
+            <field name="code">XXL</field>
+            <field name="libelle">Pot commun (>= 700 magasins)</field>
+            <field name="sequence">60</field>
+            <field name="grid_id" ref="grid_abo_pa_tierce"/>
+            <field name="shop_min">700</field>
+            <field name="shop_max">0</field>
+            <field name="caisses_included">6</field>
+            <field name="tx_caisse_mois">15000</field>
+            <field name="unit_price_12m">18.00</field>
+            <field name="unit_price_24m">16.00</field>
+            <field name="unit_price_36m">14.00</field>
+            <field name="surcharge_pa_tiers_tx">0.012</field>
+        </record>
+
+    </data>
+</odoo>

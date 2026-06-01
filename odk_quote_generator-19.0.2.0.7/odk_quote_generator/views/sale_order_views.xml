@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================== -->
+    <!-- Heritage du formulaire devis : onglet ODK + bandeau hors-grille    -->
+    <!-- ================================================================== -->
+    <record id="view_order_form_odk" model="ir.ui.view">
+        <field name="name">sale.order.form.odk</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Bandeau d'alerte hors-grille en haut du formulaire -->
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-warning" role="alert"
+                     invisible="not odk_is_quote or not odk_is_off_grid or odk_is_validated">
+                    <strong>Devis hors-grille</strong> : une ou plusieurs lignes
+                    s'ecartent du prix de la grille tarifaire ODK. La confirmation
+                    necessite la validation d'un Manager Commercial.
+                </div>
+                <div class="alert alert-success" role="alert"
+                     invisible="not odk_is_quote or not odk_is_off_grid or not odk_is_validated">
+                    <strong>Hors-grille valide</strong> par
+                    <field name="odk_validation_user_id" readonly="1" nolabel="1"
+                           class="oe_inline"/>
+                    le
+                    <field name="odk_validation_date" readonly="1" nolabel="1"
+                           class="oe_inline"/>.
+                </div>
+            </xpath>
+
+            <!-- Boutons d'action en haut du formulaire -->
+            <xpath expr="//header" position="inside">
+                <button name="action_odk_validate_off_grid"
+                        type="object"
+                        string="Valider le hors-grille"
+                        class="oe_highlight"
+                        groups="odk_quote_generator.group_odk_sales_manager"
+                        invisible="not odk_is_off_grid or odk_is_validated or not odk_is_quote"/>
+                <button name="action_odk_revoke_validation"
+                        type="object"
+                        string="Retirer la validation"
+                        groups="odk_quote_generator.group_odk_sales_manager"
+                        invisible="not odk_is_validated"/>
+            </xpath>
+
+            <!-- Onglet ODK dans le notebook -->
+            <xpath expr="//notebook" position="inside">
+                <page string="ODK" name="odk"
+                      invisible="not odk_is_quote">
+                    <group>
+                        <group string="Source tarifaire - Packs Factures"
+                               invisible="not odk_catalog_id">
+                            <field name="odk_is_quote" invisible="1"/>
+                            <field name="odk_is_mixed" readonly="1"/>
+                            <field name="odk_catalog_id" readonly="state != 'draft'"/>
+                            <field name="odk_grid_id" readonly="state != 'draft'"/>
+                            <field name="odk_tier_id" readonly="state != 'draft'"/>
+                            <field name="odk_engagement_months" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Source tarifaire - Abonnement ODK"
+                               invisible="not odk_ab_catalog_id">
+                            <field name="odk_ab_catalog_id" readonly="state != 'draft'"/>
+                            <field name="odk_ab_grid_id" readonly="state != 'draft'"/>
+                            <field name="odk_ab_tier_id" readonly="state != 'draft'"/>
+                            <field name="odk_ab_engagement_months" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Etat hors-grille">
+                            <field name="odk_is_off_grid" readonly="1"/>
+                            <field name="odk_is_validated" readonly="1"/>
+                            <field name="odk_validation_user_id" readonly="1"
+                                   invisible="not odk_is_validated"/>
+                            <field name="odk_validation_date" readonly="1"
+                                   invisible="not odk_is_validated"/>
+                        </group>
+                    </group>
+                    <group string="Variables d'entree (saisies dans le wizard)">
+                        <group>
+                            <field name="odk_input_shops"
+                                   invisible="not odk_input_shops"/>
+                            <field name="odk_input_nb_caisses"
+                                   invisible="not odk_input_nb_caisses"/>
+                            <field name="odk_input_tx_total"
+                                   invisible="not odk_input_tx_total"/>
+                        </group>
+                        <group>
+                            <field name="odk_input_volume_annuel"
+                                   invisible="not odk_input_volume_annuel"/>
+                            <field name="odk_input_pa_tierce"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+            <!-- Champs ODK sur les lignes de devis -->
+            <xpath expr="//field[@name='order_line']/list/field[@name='price_unit']"
+                   position="after">
+                <field name="odk_expected_unit_price" optional="hide"/>
+                <field name="odk_tier_id" optional="hide"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- ================================================================== -->
+    <!-- Liste des devis ODK : filtres + colonnes specifiques               -->
+    <!-- ================================================================== -->
+    <record id="view_order_tree_odk" model="ir.ui.view">
+        <field name="name">sale.order.list.odk</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="odk_catalog_id" optional="hide"/>
+                <field name="odk_grid_id" optional="hide"/>
+                <field name="odk_engagement_months" optional="hide"/>
+                <field name="odk_is_off_grid" optional="show"
+                       widget="boolean_toggle" readonly="1"/>
+                <field name="odk_is_validated" optional="hide"
+                       widget="boolean_toggle" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_order_search_odk" model="ir.ui.view">
+        <field name="name">sale.order.search.odk</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                <separator/>
+                <filter name="odk_quotes" string="Devis ODK"
+                        domain="[('odk_is_quote', '=', True)]"/>
+                <filter name="odk_off_grid" string="Hors-grille"
+                        domain="[('odk_is_off_grid', '=', True)]"/>
+                <filter name="odk_off_grid_pending" string="Hors-grille a valider"
+                        domain="[('odk_is_off_grid', '=', True), ('odk_is_validated', '=', False)]"/>
+                <filter name="odk_validated" string="Hors-grille valides"
+                        domain="[('odk_is_validated', '=', True)]"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter name="group_odk_catalog" string="Catalogue ODK"
+                        context="{'group_by': 'odk_catalog_id'}"/>
+                <filter name="group_odk_grid" string="Grille ODK"
+                        context="{'group_by': 'odk_grid_id'}"/>
+                <filter name="group_odk_engagement" string="Engagement"
+                        context="{'group_by': 'odk_engagement_months'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ================================================================== -->
+    <!-- Action dediee aux devis ODK                                        -->
+    <!-- ================================================================== -->
+    <record id="action_odk_quotes" model="ir.actions.act_window">
+        <field name="name">Devis ODK</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="domain">[('odk_is_quote', '=', True)]</field>
+        <field name="context">{'search_default_odk_quotes': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Generer un nouveau devis ODK</p>
+            <p>Les devis ODK sont generes via le wizard de generation accessible
+               depuis le menu <em>ODK Devis &gt; Nouveau devis</em>.</p>
+        </field>
+    </record>
+
+</odoo>

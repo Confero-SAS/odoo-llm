@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ============================================================== -->
+        <!-- Packs Factures V4 - OFFRE 1 (spot 0,22 EUR HT / facture)        -->
+        <!-- ============================================================== -->
+        <record id="grid_packs_offre_1" model="odk.pricing.grid">
+            <field name="name">Offre 1 - Spot 0,22 EUR</field>
+            <field name="code">OFFRE_1</field>
+            <field name="sequence">10</field>
+            <field name="catalog_id" ref="catalog_packs_factures"/>
+            <field name="company_id" eval="False"/>
+            <field name="currency_id" ref="base.EUR"/>
+            <field name="spot_price">0.22</field>
+            <field name="floor_price">0.18</field>
+        </record>
+
+        <record id="tier_packs_o1_s" model="odk.pricing.tier">
+            <field name="code">S</field>
+            <field name="libelle">Pack S</field>
+            <field name="sequence">10</field>
+            <field name="grid_id" ref="grid_packs_offre_1"/>
+            <field name="volume_annuel">100000</field>
+            <field name="unit_price_12m">0.215</field>
+            <field name="unit_price_24m">0.212</field>
+            <field name="unit_price_36m">0.209</field>
+        </record>
+
+        <record id="tier_packs_o1_m" model="odk.pricing.tier">
+            <field name="code">M</field>
+            <field name="libelle">Pack M</field>
+            <field name="sequence">20</field>
+            <field name="grid_id" ref="grid_packs_offre_1"/>
+            <field name="volume_annuel">250000</field>
+            <field name="unit_price_12m">0.208</field>
+            <field name="unit_price_24m">0.205</field>
+            <field name="unit_price_36m">0.201</field>
+        </record>
+
+        <record id="tier_packs_o1_l" model="odk.pricing.tier">
+            <field name="code">L</field>
+            <field name="libelle">Pack L</field>
+            <field name="sequence">30</field>
+            <field name="grid_id" ref="grid_packs_offre_1"/>
+            <field name="volume_annuel">500000</field>
+            <field name="unit_price_12m">0.200</field>
+            <field name="unit_price_24m">0.196</field>
+            <field name="unit_price_36m">0.193</field>
+        </record>
+
+        <record id="tier_packs_o1_xl" model="odk.pricing.tier">
+            <field name="code">XL</field>
+            <field name="libelle">Pack XL</field>
+            <field name="sequence">40</field>
+            <field name="grid_id" ref="grid_packs_offre_1"/>
+            <field name="volume_annuel">1000000</field>
+            <field name="unit_price_12m">0.192</field>
+            <field name="unit_price_24m">0.188</field>
+            <field name="unit_price_36m">0.185</field>
+        </record>
+
+        <record id="tier_packs_o1_xxl" model="odk.pricing.tier">
+            <field name="code">XXL</field>
+            <field name="libelle">Pack XXL</field>
+            <field name="sequence">50</field>
+            <field name="grid_id" ref="grid_packs_offre_1"/>
+            <field name="volume_annuel">2000000</field>
+            <field name="unit_price_12m">0.184</field>
+            <field name="unit_price_24m">0.182</field>
+            <field name="unit_price_36m">0.180</field>
+        </record>
+
+        <!-- ============================================================== -->
+        <!-- Packs Factures V4 - OFFRE 2 (bundle + PA, spot 0,28 EUR HT)     -->
+        <!-- ============================================================== -->
+        <record id="grid_packs_offre_2" model="odk.pricing.grid">
+            <field name="name">Offre 2 - Bundle PA - Spot 0,28 EUR</field>
+            <field name="code">OFFRE_2</field>
+            <field name="sequence">20</field>
+            <field name="catalog_id" ref="catalog_packs_factures"/>
+            <field name="company_id" eval="False"/>
+            <field name="currency_id" ref="base.EUR"/>
+            <field name="spot_price">0.28</field>
+            <field name="floor_price">0.18</field>
+        </record>
+
+        <record id="tier_packs_o2_s" model="odk.pricing.tier">
+            <field name="code">S</field>
+            <field name="libelle">Pack S + PA</field>
+            <field name="sequence">10</field>
+            <field name="grid_id" ref="grid_packs_offre_2"/>
+            <field name="volume_annuel">100000</field>
+            <field name="unit_price_12m">0.272</field>
+            <field name="unit_price_24m">0.268</field>
+            <field name="unit_price_36m">0.265</field>
+        </record>
+
+        <record id="tier_packs_o2_m" model="odk.pricing.tier">
+            <field name="code">M</field>
+            <field name="libelle">Pack M + PA</field>
+            <field name="sequence">20</field>
+            <field name="grid_id" ref="grid_packs_offre_2"/>
+            <field name="volume_annuel">250000</field>
+            <field name="unit_price_12m">0.262</field>
+            <field name="unit_price_24m">0.255</field>
+            <field name="unit_price_36m">0.249</field>
+        </record>
+
+        <record id="tier_packs_o2_l" model="odk.pricing.tier">
+            <field name="code">L</field>
+            <field name="libelle">Pack L + PA</field>
+            <field name="sequence">30</field>
+            <field name="grid_id" ref="grid_packs_offre_2"/>
+            <field name="volume_annuel">500000</field>
+            <field name="unit_price_12m">0.244</field>
+            <field name="unit_price_24m">0.236</field>
+            <field name="unit_price_36m">0.229</field>
+        </record>
+
+        <record id="tier_packs_o2_xl" model="odk.pricing.tier">
+            <field name="code">XL</field>
+            <field name="libelle">Pack XL + PA</field>
+            <field name="sequence">40</field>
+            <field name="grid_id" ref="grid_packs_offre_2"/>
+            <field name="volume_annuel">1000000</field>
+            <field name="unit_price_12m">0.222</field>
+            <field name="unit_price_24m">0.213</field>
+            <field name="unit_price_36m">0.205</field>
+        </record>
+
+        <record id="tier_packs_o2_xxl" model="odk.pricing.tier">
+            <field name="code">XXL</field>
+            <field name="libelle">Pack XXL + PA</field>
+            <field name="sequence">50</field>
+            <field name="grid_id" ref="grid_packs_offre_2"/>
+            <field name="volume_annuel">2000000</field>
+            <field name="unit_price_12m">0.198</field>
+            <field name="unit_price_24m">0.189</field>
+            <field name="unit_price_36m">0.180</field>
+        </record>
+
+    </data>
+</odoo>
